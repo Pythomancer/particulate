@@ -71,6 +71,24 @@ impl Particle {
         self.velocity.x += self.speed * (0.04 * rng.gen::<f32>() - 0.02);
         self.velocity.y += self.speed * (0.04 * rng.gen::<f32>() - 0.02);
     }
+    fn get_intersections (&mut self, other: Particle) -> Vec<Point>{
+        let self_bounds = self.poly.to_vecs();
+        let other_bounds = other.poly.to_vecs();
+        let mut intersections:Vec<Point> = Vec::new();
+        for vec in &self_bounds {
+            for vec2 in &other_bounds {
+                let v = vec.pt_of_intersection(&vec2);
+                if v.is_some() {
+                    intersections.push(v.unwrap());
+                }
+            }
+        }
+        intersections
+    }
+    pub fn uncollide (&mut self, other: Particle) {
+        let intersections = self.get_intersections(other);
+        // let col_vec: Point = intersections.iter().sum();
+    }
     pub fn collision_tick(&mut self, others: Vec<Particle>) {
         // for p in others{
         // }

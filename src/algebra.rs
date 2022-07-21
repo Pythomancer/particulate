@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 use std::fmt;
-use std::ops::{Add, Sub};
-
+use std::ops::{Add, Sub, AddAssign};
+use std::iter::Sum;
 #[derive(Clone, Copy, PartialEq)]
 pub struct Point {
     pub x: f32,
@@ -30,6 +30,15 @@ impl Sub for Point {
     }
 }
 
+impl AddAssign for Point {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }        
+}
+
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "(x={}, y={})", self.x, self.y)
@@ -37,6 +46,10 @@ impl fmt::Display for Point {
 }
 
 impl Point {
+    fn new () -> Point{
+        Point {x: 0.0, y:0.0}
+    }
+
     pub fn smaller_x(&self, other: &Point) -> f32 {
         if self.x < other.x {
             return self.x;
@@ -78,6 +91,10 @@ impl Point {
     pub fn reflect_across(&self, other: &Point) -> Point {
         Point::from_polar(self.radius(), 2.0 * other.angle() - self.angle())
     }
+
+    // pub fn sum(i: Iterator){
+    //     let mut s =
+    // }
 
 }
 

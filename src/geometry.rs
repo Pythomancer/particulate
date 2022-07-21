@@ -106,7 +106,7 @@ impl Poly {
     pub fn unit_circle(&self) -> Vec<Point> {
         Vec::from_iter((0..self.sides).map(|x| Point::from_polar(1.0, self.ang_at_pos(x as i32))))
     }
-    pub fn to_vec(&self) -> Vec<Vector> {
+    pub fn to_vecs(&self) -> Vec<Vector> {
         let circle = self.unit_circle();
         Vec::from_iter(circle.into_iter().map(|x| Vector {
             a: x.scale(self.size),
