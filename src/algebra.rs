@@ -1,7 +1,6 @@
 use macroquad::prelude::*;
 use std::fmt;
 use std::ops::{Add, Sub, AddAssign};
-use std::iter::Sum;
 #[derive(Clone, Copy, PartialEq)]
 pub struct Point {
     pub x: f32,
@@ -46,7 +45,7 @@ impl fmt::Display for Point {
 }
 
 impl Point {
-    fn new () -> Point{
+    pub fn new () -> Point{
         Point {x: 0.0, y:0.0}
     }
 

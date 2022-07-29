@@ -1,4 +1,3 @@
-extern crate core;
 use std::time::SystemTime;
 use macroquad::prelude::*;
 use crate::algebra::*;

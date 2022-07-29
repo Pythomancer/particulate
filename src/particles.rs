@@ -31,7 +31,7 @@ impl BBox {
         }
     }
 }
-
+#[derive(Copy, Clone)]
 pub struct Particle {
     pub poly: Poly,
     pub velocity: Point,
@@ -63,7 +63,7 @@ impl Particle {
         self.poly.color_position += 0.01;
     }
     pub fn pos_tick(&mut self) {
-        self.poly.center = self.poly.center + self.velocity;
+        self.poly.center += self.velocity;
         // println!("{}", self.quad.center);
     }
     pub fn velo_tick(&mut self) {
@@ -77,27 +77,43 @@ impl Particle {
         let mut intersections:Vec<Point> = Vec::new();
         for vec in &self_bounds {
             for vec2 in &other_bounds {
-                let v = vec.pt_of_intersection(&vec2);
-                if v.is_some() {
+                let v = vec.pt_of_intersection(vec2);
+                if let Some(..) = v {
                     intersections.push(v.unwrap());
                 }
             }
         }
         intersections
     }
-    pub fn uncollide (&mut self, other: Particle) {
-        let intersections = self.get_intersections(other);
-        // let col_vec: Point = intersections.iter().sum();
+    pub fn is_in_range (&self, other: &Particle) -> bool{
+        let dist_p = self.poly.center - other.poly.center;
+        let rad_sum = self.poly.size + other.poly.size;
+        dist_p.radius() < rad_sum
+    }
+    pub fn uncollide (&mut self, other: &mut Particle) {
+        println!("uncolliding");
+        let intersections = self.get_intersections(*other);
+        let col_vec: Point = intersections.iter().fold(Point::new(), |r, s| r + *s);
+        self.velocity = self.velocity.reflect_across(&col_vec);
+        other.velocity = other.velocity.reflect_across(&col_vec);
+        while !self.get_intersections(*other).is_empty() {
+            self.pos_tick();
+            other.pos_tick();
+        }
     }
     pub fn collision_tick(&mut self, others: Vec<Particle>) {
-        // for p in others{
-        // }
+        for mut p in others{
+            if self.is_in_range(&p) {
+                self.uncollide(&mut p);
+            }
+        }
     }
 
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self, others: Vec<Particle>) {
         self.color_tick();
         self.velo_tick();
         self.pos_tick();
+        self.collision_tick(others);
         BBox {
             x_lower: 0.0,
             x_upper: window::screen_width(),
@@ -160,8 +176,9 @@ impl Emitter {
 
     pub fn tick(&mut self) {
         for p in self.particles.iter_mut() {
-            p.tick();
+            p.tick(self.particles);
             p.draw();
+
         }
         self.particles
             .retain(|x| x.life < self.lifetime || self.lifetime < 0);

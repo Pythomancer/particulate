@@ -76,6 +76,7 @@ impl Vector {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Poly {
     pub center: Point,
     pub size: f32,
